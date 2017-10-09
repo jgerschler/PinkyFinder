@@ -13,3 +13,6 @@ plt.imshow(threshold, 'gray')
 plt.show()
 
 print("Done!")
+
+
+#m = np.zeros(size, dtype=np.uint8)
