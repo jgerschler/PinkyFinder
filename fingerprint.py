@@ -12,6 +12,17 @@ plt.subplot(1, 1, 1)
 plt.imshow(threshold, 'gray')
 plt.show()
 
+print(img.shape)
+print(img.size)
+
+def thinning_iteration(img, iter):
+    i, j = 0, 0
+    marker = np.zeros(img.shape, dtype=np.uint8)
+    for i in range(img.shape[0] - 1):
+        for j in range(img.shape[1] - 1):
+            pass
+            
+
 print("Done!")
 
 
