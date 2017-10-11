@@ -44,9 +44,10 @@ def thinning_iteration(img, iter):# iter = 0
 # incomplete
 
 def thinning(img):
-    img /= 255
+    #img /= 255
     
     prev = np.zeros(img.shape, dtype=np.uint8)
+    diff = cv2.absdiff(img, prev)
 
     while cv2.countNonZero(diff) > 0:
         thinning_iteration(img, 0)
@@ -55,7 +56,11 @@ def thinning(img):
         np.copyto(prev, img)
 
     img *= 255
+
+    return img
         
+inverted_thinned = inverted.copy()
+img = thinning(inverted_thinned)
 
 plt.subplot(1, 1, 1)
 plt.imshow(img, 'gray')
