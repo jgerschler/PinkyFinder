@@ -43,8 +43,16 @@ def thinning_iteration(img, iter):# iter = 0
             if (A == 1 and (B >= 2 and B <= 6) and m1 == 0 and m2 == 0):
                 marker[i, j] = 1
 
-            
-            
+    img &= ~marker
+
+# incomplete
+
+##def thinning(img):
+##    prev = np.zeros(img.shape, dtype=np.uint8)
+##    
+##    diff = cv2.absdiff(img, prev)
+##
+##    while cv2.countNonZero(diff) > 0:
             
 
 print("Done!")
