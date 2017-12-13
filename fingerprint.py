@@ -59,8 +59,8 @@ def thinning(img):
 
     return img
         
-inverted_thinned = inverted.copy()
-img = thinning(inverted_thinned)
+threshold_thinned = threshold.copy()
+img = thinning(threshold_thinned)
 
 plt.subplot(1, 1, 1)
 plt.imshow(img, 'gray')
