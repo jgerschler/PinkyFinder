@@ -8,8 +8,8 @@ ret, threshold = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
 inverted = cv2.bitwise_not(threshold)# invert image
 
-print(inverted.shape)
-print(inverted.size)
+##print(inverted.shape)
+##print(inverted.size)
 
 ##def _thinningIteration(img, iter):
 ##    I, M = img, np.zeros(img.shape, np.uint8)
@@ -61,5 +61,6 @@ threshold_thinned = threshold.copy()
 ##img = thinning(threshold_thinned)
 
 plt.subplot(1, 1, 1)
-plt.imshow(img, 'gray')
+plt.imshow(inverted, 'inverted')
+##plt.imshow(threshold, 'gray')
 plt.show()
