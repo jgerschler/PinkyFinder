@@ -2,12 +2,12 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-img = cv2.imread('prints\\101_1.tif', 0)
+img = cv2.imread('fingerprint.png', -1)
 
-ret, threshold = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-
-inverted = cv2.bitwise_not(threshold)# invert image
-
+##ret, threshold = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+##
+##inverted = cv2.bitwise_not(threshold)# invert image
+##
 ##print(inverted.shape)
 ##print(inverted.size)
 
@@ -57,10 +57,14 @@ inverted = cv2.bitwise_not(threshold)# invert image
 ##
 ##    return dst * 255
         
-threshold_thinned = threshold.copy()
+##threshold_thinned = threshold.copy()
 ##img = thinning(threshold_thinned)
 
-plt.subplot(1, 1, 1)
-plt.imshow(inverted, 'inverted')
-##plt.imshow(threshold, 'gray')
-plt.show()
+##plt.subplot(1, 1, 1)
+##plt.imshow(img, 'image')
+####plt.imshow(threshold, 'gray')
+##plt.show()
+
+cv2.imshow('image',img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
