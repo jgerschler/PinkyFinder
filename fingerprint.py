@@ -1,10 +1,10 @@
 import cv2
 import numpy as np
 
-img = cv2.imread('test.png', 0)
+img = cv2.imread('fingerprint.png', 0)
 retval, orig_thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)
 
-thresh = (orig_thresh == 0).astype(int)
+bin_thresh = (orig_thresh == 0).astype(int)
 
 def pixel_is_black(arr, x, y):# function included for clarity
     if arr[x, y] == 1:
@@ -46,15 +46,14 @@ def at_least_one_of_P2_P6_P8_is_white(arr, x, y):
         return True
     return False
 
-thinned_thresh = thresh.copy()
-carbon_copy = np.zeros(thresh.shape)
+thinned_thresh = bin_thresh.copy()
 
-while np.all(carbon_copy == thinned_thresh) != True:
-    carbon_copy = thinned_thresh.copy()
+while 1:
+    thresh_copy = thinned_thresh.copy()
     # step one
     pixels_meeting_criteria = []
-    for i in range(1, thresh.shape[0] - 1):
-        for j in range(1, thresh.shape[1] - 1):
+    for i in range(1, thinned_thresh.shape[0] - 1):
+        for j in range(1, thinned_thresh.shape[1] - 1):
             if (pixel_is_black(thinned_thresh, i, j) and
                 pixel_has_2_to_6_black_neighbors(thinned_thresh, i, j) and
                 pixel_has_1_white_to_black_neighbor_transition(thinned_thresh, i, j) and
@@ -67,8 +66,8 @@ while np.all(carbon_copy == thinned_thresh) != True:
 
     # step two
     pixels_meeting_criteria = []
-    for i in range(1, thresh.shape[0] - 1):
-        for j in range(1, thresh.shape[1] - 1):
+    for i in range(1, thinned_thresh.shape[0] - 1):
+        for j in range(1, thinned_thresh.shape[1] - 1):
             if (pixel_is_black(thinned_thresh, i, j) and
                 pixel_has_2_to_6_black_neighbors(thinned_thresh, i, j) and
                 pixel_has_1_white_to_black_neighbor_transition(thinned_thresh, i, j) and
@@ -79,22 +78,13 @@ while np.all(carbon_copy == thinned_thresh) != True:
     for pixel in pixels_meeting_criteria:
         thinned_thresh[pixel] = 0
 
-
-
-
-##while np.all(thresh == thinned_thresh) != True:
-##    iteration()
-
-
+    if np.all(thresh_copy == thinned_thresh) == True:
+        break
 
 thresh = (thinned_thresh == 0).astype(np.uint8)
 thresh *= 255
 
-print(orig_thresh)
-print("XXXXXXXXXXX")
-print(thresh)
-
-cv2.imshow('origimage', orig_thresh)
-cv2.imshow('thinnedimage', thresh)
+cv2.imshow('original image', orig_thresh)
+cv2.imshow('thinned image', thresh)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
