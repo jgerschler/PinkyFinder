@@ -1,67 +1,100 @@
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
 
-img = cv2.imread('prints\\101_1.tif', 0)
+img = cv2.imread('test.png', 0)
+retval, orig_thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)
 
-ret, threshold = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+thresh = (orig_thresh == 0).astype(int)
 
-inverted = cv2.bitwise_not(threshold)# invert image
+def pixel_is_black(arr, x, y):# function included for clarity
+    if arr[x, y] == 1:
+        return True
+    return False
 
-print(inverted.shape)
-print(inverted.size)
+def pixel_has_2_to_6_black_neighbors(arr, x, y):
+    if (2 <= arr[x, y-1] + arr[x+1, y-1] + arr[x+1, y] + arr[x+1, y+1] +
+        arr[x, y+1] + arr[x-1, y+1] + arr[x-1, y] + arr[x-1, y-1] <= 6):
+        return True
+    return False
 
-def thinning_iteration(img, iter):# iter = 0
-    i, j = 0, 0
-    marker = np.zeros(img.shape, dtype=np.uint8)
-    for i in range(img.shape[0] - 1):
-        for j in range(img.shape[1] - 1):
-            p2 = img[i - 1, j]
-            p3 = img[i - 1, j + 1]
-            p4 = img[i, j + 1]
-            p5 = img[i + 1, j + 1]
-            p6 = img[i + 1, j]
-            p7 = img[i + 1, j - 1]
-            p8 = img[i, j - 1]
-            p9 = img[i - 1, j - 1]
-
-            A = (int(p2 == 0 and p3 == 1) + int(p3 == 0 and p4 == 1) +
-                 int(p4 == 0 and p5 == 1) + int(p5 == 0 and p6 == 1) +
-                 int(p6 == 0 and p7 == 1) + int(p7 == 0 and p8 == 1) +
-                 int(p8 == 0 and p9 == 1) + int(p9 == 0 and p2 == 1))
-
-            B = p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9
-
-            m1 = (p2 * p4 * p6) if iter == 0 else (p2 * p4 * p8)
-
-            m2 = (p4 * p6 * p8) if iter == 0 else (p2 * p6 * p8)
-
-            if (A == 1 and (B >= 2 and B <= 6) and m1 == 0 and m2 == 0):
-                marker[i, j] = 1
-
-    img &= ~marker
-
-# incomplete
-
-def thinning(img):
-    #img /= 255
+def pixel_has_1_white_to_black_neighbor_transition(arr, x, y):
+    neighbors = [arr[x, y-1], arr[x+1, y-1], arr[x+1, y], arr[x+1, y+1],
+                 arr[x, y+1], arr[x, y+1], arr[x-1, y], arr[x-1, y-1],
+                 arr[x, y-1]]
+    transitions = sum((a, b) == (0, 1) for a, b in zip(neighbors, neighbors[1:]))
+    if transitions == 1:
+        return True
+    return False
     
-    prev = np.zeros(img.shape, dtype=np.uint8)
-    diff = cv2.absdiff(img, prev)
+def at_least_one_of_P2_P4_P6_is_white(arr, x, y):
+    if (arr[x, y-1] and arr[x+1, y] and arr[x, y+1]) == False:
+        return True
+    return False
 
-    while cv2.countNonZero(diff) > 0:
-        thinning_iteration(img, 0)
-        thinning_iteration(img, 1)
-        diff = cv2.absdiff(img, prev)
-        np.copyto(prev, img)
+def at_least_one_of_P4_P6_P8_is_white(arr, x, y):
+    if (arr[x+1, y] and arr[x, y+1] and arr[x-1, y]) == False:
+        return True
+    return False
 
-    img *= 255
+def at_least_one_of_P2_P4_P8_is_white(arr, x, y):
+    if (arr[x, y-1] and arr[x+1, y] and arr[x-1, y]) == False:
+        return True
+    return False
 
-    return img
-        
-threshold_thinned = threshold.copy()
-img = thinning(threshold_thinned)
+def at_least_one_of_P2_P6_P8_is_white(arr, x, y):
+    if (arr[x, y-1] and arr[x, y+1] and arr[x-1, y]) == False:
+        return True
+    return False
 
-plt.subplot(1, 1, 1)
-plt.imshow(img, 'gray')
-plt.show()
+thinned_thresh = thresh.copy()
+carbon_copy = np.zeros(thresh.shape)
+
+while np.all(carbon_copy == thinned_thresh) != True:
+    carbon_copy = thinned_thresh.copy()
+    # step one
+    pixels_meeting_criteria = []
+    for i in range(1, thresh.shape[0] - 1):
+        for j in range(1, thresh.shape[1] - 1):
+            if (pixel_is_black(thinned_thresh, i, j) and
+                pixel_has_2_to_6_black_neighbors(thinned_thresh, i, j) and
+                pixel_has_1_white_to_black_neighbor_transition(thinned_thresh, i, j) and
+                at_least_one_of_P2_P4_P6_is_white(thinned_thresh, i, j) and
+                at_least_one_of_P4_P6_P8_is_white(thinned_thresh, i, j)):
+                pixels_meeting_criteria.append((i, j))
+
+    for pixel in pixels_meeting_criteria:
+        thinned_thresh[pixel] = 0
+
+    # step two
+    pixels_meeting_criteria = []
+    for i in range(1, thresh.shape[0] - 1):
+        for j in range(1, thresh.shape[1] - 1):
+            if (pixel_is_black(thinned_thresh, i, j) and
+                pixel_has_2_to_6_black_neighbors(thinned_thresh, i, j) and
+                pixel_has_1_white_to_black_neighbor_transition(thinned_thresh, i, j) and
+                at_least_one_of_P2_P4_P8_is_white(thinned_thresh, i, j) and
+                at_least_one_of_P2_P6_P8_is_white(thinned_thresh, i, j)):
+                pixels_meeting_criteria.append((i, j))
+
+    for pixel in pixels_meeting_criteria:
+        thinned_thresh[pixel] = 0
+
+
+
+
+##while np.all(thresh == thinned_thresh) != True:
+##    iteration()
+
+
+
+thresh = (thinned_thresh == 0).astype(np.uint8)
+thresh *= 255
+
+print(orig_thresh)
+print("XXXXXXXXXXX")
+print(thresh)
+
+cv2.imshow('origimage', orig_thresh)
+cv2.imshow('thinnedimage', thresh)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
