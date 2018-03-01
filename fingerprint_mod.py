@@ -84,14 +84,15 @@ while 1:
 thresh = (thinned_thresh == 0).astype(np.uint8)
 thresh *= 255
 
-corners = cv2.goodFeaturesToTrack(thresh, 10, 0.01, 3)
-corners = np.int0(corners)
+corners = cv2.cornerHarris(thresh, 3, 3, 0.04)
 
 thresh = cv2.cvtColor(thresh, cv2.COLOR_GRAY2RGB)
 
-for i in corners:
-    x, y = i.ravel()
-    cv2.circle(thresh, (x, y), 5, (0, 69, 255), 1)
+print(corners)
+
+##for i in corners:
+##    x, y = i.ravel()
+##    cv2.circle(thresh, (x, y), 5, (0, 69, 255), 1)
 
 cv2.imshow('thinned image', thresh)
 cv2.waitKey(0)
