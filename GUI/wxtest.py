@@ -14,13 +14,13 @@ class MainFrame(wx.Frame):
         fileMenu.AppendSeparator()
 
         imp = wx.Menu()
-        imp.Append(wx.ID_ANY, 'Import newsfeed list...')
-        imp.Append(wx.ID_ANY, 'Import bookmarks...')
-        imp.Append(wx.ID_ANY, 'Import mail...')
+        imp.Append(wx.ID_ANY, 'Import new print...')
+        imp.Append(wx.ID_ANY, 'Find existing print...')
 
         fileMenu.Append(wx.ID_ANY, 'I&mport', imp)
 
         qmi = wx.MenuItem(fileMenu, wx.ID_EXIT, '&Quit\tCtrl+W')
+##        qmi.SetBitmap(wx.Bitmap('exit.png'))
         fileMenu.Append(qmi)
 
         self.Bind(wx.EVT_MENU, self.OnQuit, qmi)
