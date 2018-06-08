@@ -6,12 +6,27 @@ class MainFrame(wx.Frame):
         super(MainFrame, self).__init__(parent, title=title, size=size)
 
         menubar = wx.MenuBar()
+
         fileMenu = wx.Menu()
-        fileItem = fileMenu.Append(wx.ID_EXIT, 'Quit', 'Quit application')
+        fileMenu.Append(wx.ID_NEW, '&New')
+        fileMenu.Append(wx.ID_OPEN, '&Open')
+        fileMenu.Append(wx.ID_SAVE, '&Save')
+        fileMenu.AppendSeparator()
+
+        imp = wx.Menu()
+        imp.Append(wx.ID_ANY, 'Import newsfeed list...')
+        imp.Append(wx.ID_ANY, 'Import bookmarks...')
+        imp.Append(wx.ID_ANY, 'Import mail...')
+
+        fileMenu.Append(wx.ID_ANY, 'I&mport', imp)
+
+        qmi = wx.MenuItem(fileMenu, wx.ID_EXIT, '&Quit\tCtrl+W')
+        fileMenu.Append(qmi)
+
+        self.Bind(wx.EVT_MENU, self.OnQuit, qmi)
+
         menubar.Append(fileMenu, '&File')
         self.SetMenuBar(menubar)
-
-        self.Bind(wx.EVT_MENU, self.OnQuit, fileItem)
 
         self.Center()
         self.Maximize()
